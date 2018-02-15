@@ -13,6 +13,16 @@ public enum FloatyItemLabelPositionType {
     case right
 }
 
+public enum FloatyItemType {
+    case circle
+    case rounded
+}
+
+public enum FloatyItemTextType {
+    case text
+    case none
+}
+
 /**
  Floating Action Button Object's item.
  */
@@ -31,6 +41,26 @@ open class FloatyItem: UIView {
             self.setNeedsDisplay()
         }
     }
+    
+    /**
+     This object's button width.
+     */
+    open var width: CGFloat = 42
+    
+    /**
+     This object's button height.
+     */
+    open var height: CGFloat = 42
+    
+    /**
+     This object's button offset top & bottom.
+     */
+    open var offsetTopBottom: CGFloat = 10
+    
+    /**
+     This object's button offset left & right.
+     */
+    open var offsetLeftRight: CGFloat = 20
 
     /**
      Button color.
@@ -102,6 +132,18 @@ open class FloatyItem: UIView {
             }
         }
     }
+    
+    /**
+     Item's title label position.
+     deafult is circle
+     */
+    open var itemType: FloatyItemType = FloatyItemType.circle
+    
+    /**
+     Item's title text.
+     deafult is none
+     */
+    open var itemTextType: FloatyItemTextType = FloatyItemTextType.none
 
     /**
      Item's title label.
@@ -142,6 +184,17 @@ open class FloatyItem: UIView {
             
         }
     }
+    
+    
+    /**
+     Item's title text.
+     */
+    open var titleText: String? = nil
+    
+    /**
+     Item's font title text.
+     */
+    open var fontTitleText = UIFont.systemFont(ofSize: 16)
 
     /**
      Item's icon image view.
@@ -208,8 +261,19 @@ open class FloatyItem: UIView {
 
         self.layer.shouldRasterize = true
         self.layer.rasterizationScale = UIScreen.main.scale
-        createCircleLayer()
-        setShadow()
+        
+        
+        if itemType == FloatyItemType.rounded {
+            createRoundedLayer()
+            
+            if itemTextType == FloatyItemTextType.text {
+                createTextLayer()
+            }
+        } else {
+            createCircleLayer()
+            setShadow()
+        }
+        
 
         if _titleLabel != nil {
             bringSubview(toFront: _titleLabel!)
@@ -226,6 +290,38 @@ open class FloatyItem: UIView {
         circleLayer.backgroundColor = buttonColor.cgColor
         circleLayer.cornerRadius = size/2
         layer.addSublayer(circleLayer)
+    }
+    
+    fileprivate func createRoundedLayer() {
+        if itemTextType == FloatyItemTextType.text {
+            let textWidth =  titleText?.size(OfFont: fontTitleText).width ?? 0
+            let textHight =  titleText?.size(OfFont: fontTitleText).height ?? 0
+            width = textWidth + offsetLeftRight
+            height = textHight + offsetTopBottom
+        }
+        
+        circleLayer.path = UIBezierPath(roundedRect: CGRect(x: 0, y: 0, width: width, height: height), cornerRadius: 20).cgPath
+        circleLayer.fillColor = buttonColor.cgColor
+        
+        layer.addSublayer(circleLayer)
+    }
+    
+    fileprivate func createTextLayer() {
+        let textWidth =  titleText?.size(OfFont: fontTitleText).width ?? 0
+        let textHight =  titleText?.size(OfFont: fontTitleText).height ?? 0
+        let width = textWidth + offsetLeftRight
+        let height = textHight + offsetTopBottom
+        
+        let textLayer = CATextLayer()
+        textLayer.frame = CGRect(x: width/2 - textWidth/2, y: height/2 - textHight/2, width: width, height: height)
+        textLayer.string = titleText
+        textLayer.foregroundColor = titleColor.cgColor
+        textLayer.fontSize = fontTitleText.pointSize
+        textLayer.isWrapped = true
+        textLayer.alignmentMode = kCAAlignmentLeft
+        textLayer.contentsScale = UIScreen.main.scale
+        
+        layer.addSublayer(textLayer)
     }
 
     fileprivate func createTintLayer() {

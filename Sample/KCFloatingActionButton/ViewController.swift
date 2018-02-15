@@ -17,6 +17,39 @@ class ViewController: UIViewController, FloatyDelegate {
         
 
         layoutFAB()
+        
+        let uiview = UIView()
+        
+        let inter = "International"
+        let lokas = "Lokal"
+        let font = UIFont.systemFont(ofSize: 14)
+        let interwidth = inter.size(OfFont: font).width
+        let interheight = inter.size(OfFont: font).height
+        let width = interwidth + 20
+        let height = interheight + 10
+        
+        print("#inter \(inter.size(OfFont: font).width)")
+        print("#lokal \(lokas.size(OfFont: font).width)")
+        
+        uiview.frame = CGRect(x: 64, y: 64, width: width, height: height)
+        
+        let layer = CAShapeLayer()
+        layer.path = UIBezierPath(roundedRect: CGRect(x: 0, y: 0, width: width, height: height), cornerRadius: 20).cgPath
+        layer.fillColor = UIColor.red.cgColor
+        
+        let textLayer = CATextLayer()
+        textLayer.frame = CGRect(x: width/2 - interwidth/2, y: height/2 - interheight/2, width: width, height: height)
+        textLayer.string = inter
+        textLayer.foregroundColor = UIColor.darkGray.cgColor
+        textLayer.fontSize = 14
+        textLayer.isWrapped = true
+        textLayer.alignmentMode = kCAAlignmentLeft
+        textLayer.contentsScale = UIScreen.main.scale
+        
+        uiview.layer.addSublayer(layer)
+        uiview.layer.addSublayer(textLayer)
+        uiview.center.x = self.view.center.x
+        self.view.addSubview(uiview)
     }
 
     @IBAction func endEditing() {
@@ -42,16 +75,33 @@ class ViewController: UIViewController, FloatyDelegate {
         item.handler = { item in
             
         }
+        
+        let item0 = FloatyItem()
+        item0.itemTextType = .text
+        item0.itemType = .rounded
+        item0.buttonColor = UIColor.orange
+        item0.titleColor = UIColor.white
+        item0.titleText = "International"
+        
+        let item1 = FloatyItem()
+        item1.itemTextType = .text
+        item1.itemType = .rounded
+        item1.buttonColor = UIColor.orange
+        item1.titleColor = UIColor.white
+        item1.titleText = "Lokal"
 
+        floaty.buttonImageAnimated = false
         floaty.hasShadow = false
-        floaty.addItem(title: "I got a title")
-        floaty.addItem("I got a icon", icon: UIImage(named: "icShare"))
-        floaty.addItem("I got a handler", icon: UIImage(named: "icMap")) { item in
-            let alert = UIAlertController(title: "Hey", message: "I'm hungry...", preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "Me too", style: .default, handler: nil))
-            self.present(alert, animated: true, completion: nil)
-        }
-        floaty.addItem(item: item)
+//        floaty.addItem(title: "I got a title")
+//        floaty.addItem("I got a icon", icon: UIImage(named: "icShare"))
+//        floaty.addItem("I got a handler", icon: UIImage(named: "icMap")) { item in
+//            let alert = UIAlertController(title: "Hey", message: "I'm hungry...", preferredStyle: .alert)
+//            alert.addAction(UIAlertAction(title: "Me too", style: .default, handler: nil))
+//            self.present(alert, animated: true, completion: nil)
+//        }
+//        floaty.addItem(item: item)
+        floaty.addItem(item: item0)
+        floaty.addItem(item: item1)
         floaty.paddingX = self.view.frame.width/2 - floaty.frame.width/2
         floaty.fabDelegate = self
         

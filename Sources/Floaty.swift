@@ -87,6 +87,11 @@ open class Floaty: UIView {
     }
     
     /**
+     Button animated.
+     */
+    @IBInspectable open var buttonImageAnimated = true
+    
+    /**
      Plus icon color inside button.
      */
     @IBInspectable open var plusColor: UIColor = UIColor(white: 0.2, alpha: 1)
@@ -294,8 +299,12 @@ open class Floaty: UIView {
                            usingSpringWithDamping: 0.55,
                            initialSpringVelocity: 0.3,
                            options: UIViewAnimationOptions(), animations: { () -> Void in
-                            self.plusLayer.transform = CATransform3DMakeRotation(self.degreesToRadians(self.rotationDegrees), 0.0, 0.0, 1.0)
-                            self.buttonImageView.transform = CGAffineTransform(rotationAngle: self.degreesToRadians(self.rotationDegrees))
+                            
+                            if self.buttonImageAnimated {
+                                self.plusLayer.transform = CATransform3DMakeRotation(self.degreesToRadians(self.rotationDegrees), 0.0, 0.0, 1.0)
+                                self.buttonImageView.transform = CGAffineTransform(rotationAngle: self.degreesToRadians(self.rotationDegrees))
+                            }
+                            
                             self.overlayView.alpha = 1
             }, completion: {(f) -> Void in
                 self.overlayViewDidCompleteOpenAnimation = true
@@ -394,6 +403,7 @@ open class Floaty: UIView {
     open func addItem(item: FloatyItem) {
         let big = size > item.size ? size : item.size
         let small = size <= item.size ? size : item.size
+        let origin = CGPoint(x: big/2-small/2, y: big/2-small/2)
         item.frame.origin = CGPoint(x: big/2-small/2, y: big/2-small/2)
         item.alpha = 0
         item.actionButton = self
@@ -761,6 +771,7 @@ open class Floaty: UIView {
             let big = size > item.size ? size : item.size
             let small = size <= item.size ? size : item.size
             item.frame.origin = CGPoint(x: big/2-small/2, y: big/2-small/2)
+            item.center.x = item.center.x
         }
     }
     
@@ -907,9 +918,15 @@ extension Floaty {
             if item.isHidden == true { continue }
             itemHeight += item.size + itemSpace
             item.layer.transform = CATransform3DIdentity
-            let big = size > item.size ? size : item.size
-            let small = size <= item.size ? size : item.size
-            item.frame.origin.x = big/2-small/2
+           
+            if item.itemType == .rounded && item.itemTextType == .text {
+                item.frame.origin.x = size/2 - item.width/2
+            } else {
+                let big = size > item.size ? size : item.size
+                let small = size <= item.size ? size : item.size
+                item.frame.origin.x = big/2-small/2
+            }
+        
             if verticalDirection == .up {
                 item.frame.origin.y = -itemHeight
             } else {
